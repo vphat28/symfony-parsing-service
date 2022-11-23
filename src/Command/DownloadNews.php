@@ -3,6 +3,7 @@
 // src/Command/CreateUserCommand.php
 namespace App\Command;
 
+use App\Service\Crawler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -12,8 +13,24 @@ class DownloadNews extends Command
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'app:download-news';
 
+    /** @var Crawler */
+    protected Crawler $crawler;
+
+    /**
+     * @param Crawler $crawler
+     * @param string|null $name
+     */
+    public function __construct(Crawler $crawler, string $name = null)
+    {
+        $this->crawler = $crawler;
+
+        parent::__construct($name);
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $a = $this->crawler->getHappyMessage();
+        var_dump($a);
         // ... put here the code to create the user
 
         // this method must return an integer number with the "exit status code"

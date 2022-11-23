@@ -1,4 +1,4 @@
-{ 
+{
     "name": "symfony/skeleton",
     "type": "project",
     "license": "MIT",
@@ -6,7 +6,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": ">=8.1.12",
+        "php": ">=7.4",
         "ext-ctype": "*",
         "ext-iconv": "*",
         "symfony/console": "5.4.*",
