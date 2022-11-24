@@ -3,10 +3,12 @@
 // src/Command/CreateUserCommand.php
 namespace App\Command;
 
+use App\Message\WebpageContent;
 use App\Service\Crawler;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class DownloadNews extends Command
 {
@@ -16,21 +18,24 @@ class DownloadNews extends Command
     /** @var Crawler */
     protected Crawler $crawler;
 
+    /** @var MessageBusInterface */
+    protected $bus;
+
     /**
      * @param Crawler $crawler
      * @param string|null $name
      */
-    public function __construct(Crawler $crawler, string $name = null)
+    public function __construct(Crawler $crawler, MessageBusInterface $bus, string $name = null)
     {
         $this->crawler = $crawler;
+        $this->bus = $bus;
 
         parent::__construct($name);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $a = $this->crawler->getHappyMessage();
-        var_dump($a);
+        $this->bus->dispatch(new WebpageContent('hello world'));
         // ... put here the code to create the user
 
         // this method must return an integer number with the "exit status code"

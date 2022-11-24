@@ -65,9 +65,11 @@ services:
       - ./docker/mysql/data:/var/lib/mysql
 
   rabbitmq:
-    image: rabbitmq:3.7-management
-    ports: [ 5672, 15672 ]  
-# Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
+    image: rabbitmq:3.9-management
+    ports: 
+     - '5672:5672'
+     - '15672:15672'
+       
 ###> symfony/mercure-bundle ###
 ###< symfony/mercure-bundle ###
 

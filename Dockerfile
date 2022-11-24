@@ -41,6 +41,7 @@ RUN set -eux; \
     	intl \
     	zip \
     	apcu \
+    	amqp \
     	pdo_mysql \
 		opcache \
     ;

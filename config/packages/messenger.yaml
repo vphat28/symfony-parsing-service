@@ -4,4 +4,7 @@ framework:
             async:
                 dsn: "%env(RABBITMQ_URL)%"
                 options:
-                    auto_setup: false
+                    auto_setup: true
+        routing:
+            # async is whatever name you gave your transport above
+            'App\Message\WebpageContent': async
