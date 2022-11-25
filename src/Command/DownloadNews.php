@@ -9,9 +9,11 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class DownloadNews extends Command
 {
+
     // the name of the command (the part after "bin/console")
     protected static $defaultName = 'app:download-news';
 
@@ -21,36 +23,57 @@ class DownloadNews extends Command
     /** @var MessageBusInterface */
     protected $bus;
 
+    /** @var HttpClientInterface */
+    protected $client;
+
     /**
-     * @param Crawler $crawler
-     * @param string|null $name
+     * @param  Crawler  $crawler
+     * @param  string|null  $name
      */
-    public function __construct(Crawler $crawler, MessageBusInterface $bus, string $name = null)
-    {
+    public function __construct(
+        Crawler $crawler,
+        MessageBusInterface $bus,
+        HttpClientInterface $client,
+        string $name = null
+    ) {
         $this->crawler = $crawler;
-        $this->bus = $bus;
+        $this->bus     = $bus;
+        $this->client  = $client;
 
         parent::__construct($name);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
-    {
-        $this->bus->dispatch(new WebpageContent('hello world'));
-        // ... put here the code to create the user
+    protected function execute(
+        InputInterface $input,
+        OutputInterface $output
+    ): int {
+        $i = 1;
 
-        // this method must return an integer number with the "exit status code"
-        // of the command. You can also use these constants to make code more readable
+        while ($i < 3) {
+            $response = $this->client->request('POST',
+                'https://highload.today/wp-content/themes/supermc/ajax/loadarchive.php',
+                [
+                    'body' => [
+                        'action' => 'archiveload',
+                        'stick'  => '35',
+                        'page'   => $i,
+                        'cat'    => '537',
+                    ],
+                ]);
 
-        // return this if there was no problem running the command
-        // (it's equivalent to returning int(0))
+            if (!empty($response->getContent())
+                && $response->getStatusCode() >= 200
+                && $response->getStatusCode() < 300
+            ) {
+                $this->bus->dispatch(new WebpageContent($response->getContent()));
+            } else {
+                break;
+            }
+
+            $i++;
+        }
+
         return Command::SUCCESS;
-
-        // or return this if some error happened during the execution
-        // (it's equivalent to returning int(1))
-        // return Command::FAILURE;
-
-        // or return this to indicate incorrect command usage; e.g. invalid options
-        // or missing arguments (it's equivalent to returning int(2))
-        // return Command::INVALID
     }
+
 }
