@@ -34,6 +34,10 @@ class WebpageContentHandler implements MessageHandlerInterface
     {
         $xml = simplexml_load_string('<div>'.$message->getContent().'</div>');
 
+        if (!is_dir($this->parameterBag->get('articles_directory'))) {
+            mkdir($this->parameterBag->get('articles_directory'), 775, true);
+        }
+
         foreach ($xml as $div) {
             $title    = $div->a[0]->h2;
             $img      = $div->a[1]->div->img['src'];
