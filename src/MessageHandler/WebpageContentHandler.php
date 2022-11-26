@@ -17,13 +17,13 @@ class WebpageContentHandler implements MessageHandlerInterface
     protected ParameterBagInterface $parameterBag;
 
     /**
-     * @param  LoggerInterface  $logger
+     * @param LoggerInterface $logger
      */
     public function __construct(
         LoggerInterface $logger,
         ParameterBagInterface $parameterBag
     ) {
-        $this->logger       = $logger;
+        $this->logger = $logger;
         $this->parameterBag = $parameterBag;
     }
 
@@ -39,11 +39,22 @@ class WebpageContentHandler implements MessageHandlerInterface
         }
 
         foreach ($xml as $div) {
-            $title    = $div->a[0]->h2;
-            $img      = $div->a[1]->div->img['src'];
+            $title = $div->a[0]->h2;
+            $img = $div->a[1]->div->img['src'];
             $pathInfo = pathinfo($img);
-            file_put_contents($this->parameterBag->get('articles_directory').'/'
-                .$pathInfo['basename'], file_get_contents($img));
+            $urlParts = parse_url($img);
+            $path = $urlParts['path'];
+            $path = explode('/', $path);
+            unset($path[0]);
+            unset($path[1]);
+            unset($path[2]);
+            array_pop($path);
+            $path = $this->parameterBag->get('articles_directory').'/'.implode('/', $path);
+            $this->logger->info($path);
+            if (!is_dir($path)) {
+                mkdir($path, 755, true);
+            }
+            file_put_contents($path.'/'.$pathInfo['basename'], file_get_contents($img));
             $shortDescription = $div->p;
             $this->logger->info($title);
             $this->logger->info($shortDescription);
